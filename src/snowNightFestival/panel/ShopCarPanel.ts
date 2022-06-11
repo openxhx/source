@@ -1,0 +1,135 @@
+namespace snowNightFestival {
+    export class ShopCarPanel extends ui.snowNightFestival.panel.ShopCarPanelUI {
+        private _model: SnowNightFestivalModel;
+        private money = clientCore.MoneyManager.SPIRIT_BEAN_MONEY_ID;
+        private selectId: number[];
+        constructor(sign: number) {
+            super();
+            this._model = clientCore.CManager.getModel(sign) as SnowNightFestivalModel;
+            this.list.vScrollBarSkin = "";
+            this.list.renderHandler = new Laya.Handler(this, this.onListRender);
+            this.list.mouseHandler = new Laya.Handler(this, this.onListClick);
+        }
+
+        public show() {
+            this.list.dataSource = this._model.buyCarInfo;
+            this.selectId = this._model.buyCarInfo.slice();
+            clientCore.DialogMgr.ins.open(this);
+            this.refreshView();
+        }
+
+        private onListRender(cell: ui.snowNightFestival.render.ShopCarRenderUI, idx: number) {
+            let id = cell.dataSource as number;
+            let config = xls.get(xls.eventExchange).get(id);
+            let item: number = clientCore.LocalInfo.sex == 1 ? config.femaleProperty[0].v1 : config.maleProperty[0].v1;
+            let price: number = config.cost[0].v2;
+            cell.imgIcon.skin = clientCore.ItemsInfo.getItemIconUrl(item);
+            cell.txtName.text = clientCore.ItemsInfo.getItemName(item);
+            cell.imgSelect.visible = this.selectId.indexOf(id) > -1;
+            cell.labPrice.text = price.toString();
+        }
+
+        private onListClick(e: Laya.Event, idx: number) {
+            if (e.type == Laya.Event.CLICK && e.target.name == "btnSelect") {
+                let id = this.list.getItem(idx);
+                if (this.selectId.indexOf(id) == -1)
+                    this.selectId.push(id);
+                else
+                    _.pull(this.selectId, id);
+                this.list.startIndex = this.list.startIndex;
+                this.refreshView();
+            }
+        }
+
+        private refreshView() {
+            this.imgAll.visible = this.selectId.length == this._model.buyCarInfo.length && this.selectId.length != 0;
+            this.setPrice();
+        }
+
+        /**计算购物车价格 */
+        private setPrice() {
+            let price = 0;
+            for (let i: number = 0; i < this.selectId.length; i++) {
+                price += xls.get(xls.eventExchange).get(this.selectId[i]).cost[0].v2;
+            }
+            this.labPrice.text = "" + price;
+        }
+
+        private onClose() {
+            clientCore.DialogMgr.ins.close(this);
+        }
+
+        private onAll() {
+            if (this.imgAll.visible)
+                this.selectId = [];
+            else
+                this.selectId = this._model.buyCarInfo.slice();
+            this.list.refresh();
+            this.refreshView();
+        }
+
+        private waiting: boolean = false;
+        private async onBuy() {
+            if (this.waiting) return;
+            let has: number = clientCore.ItemsInfo.getItemNum(this.money);
+            let diff: number = Number(this.labPrice.text) - has;
+            if (diff > 0) {
+                alert.showSmall("灵豆不足，是否前往补充？", { callBack: { funArr: [() => { clientCore.ToolTip.gotoMod(50); }], caller: this } });
+                return;
+            }
+            if (this._model.buyCarInfo.length > this.selectId.length) {
+                alert.showSmall("购物车中有未选中商品，是否确认结算？", {
+                    callBack: {
+                        caller: this, funArr: [this.judgeBuy]
+                    }
+                })
+            } else {
+                this.judgeBuy();
+            }
+        }
+
+        private async judgeBuy() {
+            if (this.selectId.length > 0) {
+                this.waiting = true;
+                let buyOk = await this.buy();
+                if (!buyOk) {
+                    this.waiting = false;
+                    return;
+                }
+            }
+            _.pullAll(this._model.buyCarInfo, this.selectId);
+            this.selectId = [];
+            this.list.refresh();
+            this.refreshView();
+            this.waiting = false;
+        }
+
+        private buy() {
+            return net.sendAndWait(new pb.cs_snowy_night_buy_items({ ids: this.selectId })).then((data: pb.sc_snowy_night_buy_items) => {
+                alert.showReward(clientCore.GoodsInfo.createArray(data.items));
+                return Promise.resolve(true);
+            })
+        }
+
+        private onClearAll() {
+            this._model.buyCarInfo = this.selectId = [];
+            this.list.dataSource = []
+            this.refreshView();
+        }
+
+        addEventListeners() {
+            BC.addEvent(this, this.btnClose, Laya.Event.CLICK, this, this.onClose);
+            BC.addEvent(this, this.btnBuyAll, Laya.Event.CLICK, this, this.onAll);
+            BC.addEvent(this, this.btnBuy, Laya.Event.CLICK, this, this.onBuy);
+            BC.addEvent(this, this.btnRemoveAll, Laya.Event.CLICK, this, this.onClearAll);
+        }
+
+        removeEventListeners() {
+            BC.removeEvent(this);
+        }
+
+        destroy() {
+            super.destroy();
+        }
+    }
+}
