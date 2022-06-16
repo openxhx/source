@@ -19,7 +19,7 @@ namespace godMirror {
                 }
             })
             let sex = clientCore.LocalInfo.sex;
-            let reward = xls.get(xls.godMirrorReward).get(5);
+            let reward = xls.get(xls.godMirrorReward).get(6);
             let reward1 = sex == 1 ? reward.reward1female : reward.reward1male;
             this.imgTitle.skin = pathConfig.getTitleUrl(reward1[0].v1);
             this.imgWing.skin = clientCore.ItemsInfo.getItemIconUrl(reward1[1].v1);

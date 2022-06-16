@@ -44,6 +44,13 @@ namespace plumYellow {
             378,
             42
         ];
+        private DISCOUNT_PRICE520 = [
+            520,
+            260,
+            364,
+            468,
+            52
+        ];
     
          private DISCOUNT_PRICE450 = [
             450,
@@ -63,11 +70,7 @@ namespace plumYellow {
         async show(box: any) {
             clientCore.UIManager.setMoneyIds([this.coin , 0]);
             clientCore.UIManager.showCoinBox();
-            if(this.cfg.stage == 1){
-                clientCore.Logger.sendLog('2022年5月27日活动', '【付费】梅子黄时', '打开夏转年年面板');
-            }else{
-                clientCore.Logger.sendLog('2022年5月20日活动', '【付费】梅子黄时', '打开夏转年年-晚节气小满面板');
-            }
+            clientCore.Logger.sendLog('2022年6月10日活动', '【付费】梅子黄时', '打开夏转年年-沧海龙吟面板');
             await net.sendAndWait(new pb.cs_star_sakura({ activeId: PlumYellowModel.instance.activityId, stage: this.cfg.index })).then((data: pb.sc_star_sakura) => {
                 this.currPrice = data.num;
                 this.refreshTimes = data.times;
@@ -85,23 +88,24 @@ namespace plumYellow {
         }
 
         initView(){
-            this.giftName.skin = `plumYellow/DisCountDrawPanel/gift_name${this.cfg.stage}.png`;
-            this.gift.skin = `plumYellow/DisCountDrawPanel/gift${this.cfg.stage}.png`;
-            this.suitName.skin = `plumYellow/DisCountDrawPanel/suit_name${this.cfg.stage}.png`;
-            this.di.skin = `plumYellow/DisCountDrawPanel/di${this.cfg.stage}.png`;
-            this.btnTurn1.skin = `plumYellow/DisCountDrawPanel/zhuan_lun${this.cfg.stage}.png`;
-            this.imgSuit.skin = `res/rechargeCloth/${this.cfg.suitId}_${clientCore.LocalInfo.sex}.png`;
-            this.price.skin = `plumYellow/DisCountDrawPanel/di_${this.cfg.price}.png`;
-            if(this.cfg.stage == 1){
-                this.di1.skin = `plumYellow/DisCountDrawPanel/di_xz1.png`;
-                this.di2.skin = `plumYellow/DisCountDrawPanel/di_xz0.png`;
-                this.btnTry0.y = 414;
-            }else{
-                this.di1.skin = `plumYellow/DisCountDrawPanel/di_xz0.png`;
-                this.di2.skin = `plumYellow/DisCountDrawPanel/di_xz1.png`;
-                this.btnTry0.y = 466;
-            }
+            // this.giftName.skin = `plumYellow/DisCountDrawPanel/gift_name${this.cfg.stage}.png`;
+            // this.gift.skin = `plumYellow/DisCountDrawPanel/gift${this.cfg.stage}.png`;
+            // this.suitName.skin = `plumYellow/DisCountDrawPanel/suit_name${this.cfg.stage}.png`;
+            // this.di.skin = `plumYellow/DisCountDrawPanel/di${this.cfg.stage}.png`;
+            // this.btnTurn1.skin = `plumYellow/DisCountDrawPanel/zhuan_lun${this.cfg.stage}.png`;
+            // this.imgSuit.skin = `res/rechargeCloth/${this.cfg.suitId}_${clientCore.LocalInfo.sex}.png`;
+            // this.price.skin = `plumYellow/DisCountDrawPanel/di_${this.cfg.price}.png`;
+            // if(this.cfg.stage == 1){
+            //     this.di1.skin = `plumYellow/DisCountDrawPanel/di_xz1.png`;
+            //     this.di2.skin = `plumYellow/DisCountDrawPanel/di_xz0.png`;
+            //     this.btnTry0.y = 414;
+            // }else{
+            //     this.di1.skin = `plumYellow/DisCountDrawPanel/di_xz0.png`;
+            //     this.di2.skin = `plumYellow/DisCountDrawPanel/di_xz1.png`;
+            //     this.btnTry0.y = 466;
+            // }
             this.tab2.visible = false;
+            this.imgSuit.skin = `res/rechargeCloth/${this.cfg.suitId}_${clientCore.LocalInfo.sex}.png`;
         }
 
         private updateView() {
@@ -144,7 +148,9 @@ namespace plumYellow {
         private onSuit(i: number) {
             if (i == 0) {
                 clientCore.ModuleManager.open('rewardDetail.PreviewModule', this.cfg.suitId);
-            } 
+            } else{
+                clientCore.ModuleManager.open('previewBG.PreviewBGModule', { id: this.cfg.giftArr, condition: '' });
+            }
         }
 
         private onTurn() {
@@ -228,6 +234,7 @@ namespace plumYellow {
         addEventListeners() {
             BC.addEvent(this, this.btnBuy, Laya.Event.CLICK, this, this.onBuy);
             BC.addEvent(this, this.btnTry0, Laya.Event.CLICK, this, this.onSuit , [0]);
+            BC.addEvent(this, this.btnTry1, Laya.Event.CLICK, this, this.onSuit , [1]);
             BC.addEvent(this, this.btnTurn, Laya.Event.CLICK, this, this.onTurn);
             BC.addEvent(this, this.btnTurn1, Laya.Event.CLICK, this, this.onTurn);
             BC.addEvent(this, this.btnRule, Laya.Event.CLICK, this, this.onDetail);

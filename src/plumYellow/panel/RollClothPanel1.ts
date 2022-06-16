@@ -2,18 +2,18 @@ namespace plumYellow {
     /**
      * 转盘抽衣服
      */
-    export class RollClothPanel extends ui.plumYellow.panel.RollClothPanelUI {
+    export class RollClothPanel1 extends ui.plumYellow.panel.RollClothPanel1UI {
         /** 抽奖功能ID*/
-        private _poolId: number = 42;
+        private _poolId: number = 43;
         /** 抽奖使用的道具ID*/
-        private _costItemId: number = 9900338;
+        private _costItemId: number = 9900340;
         /**套装ID */
-        private _suitId: number = 2110668;
+        private _suitId: number = 2110671;
         /**集齐奖励ID */
-        private _giftId1: number[] = [1000196, 1100137];
-        private _giftId2: number[] = [145748, 145750, 1200042];
+        private _giftId1: number[][] = [[143837, 143825] , [143847 , 143840]];
+        private _giftId2: number[][] = [[143831, 143838] , [143846 , 143853]];
         /**帮助说明id */
-        private _ruleId: number = 1189;
+        private _ruleId: number = 1175;
 
         private _select: number = -1;
         private _disposed: boolean;
@@ -29,16 +29,18 @@ namespace plumYellow {
             super();
             this._disposed = false;
             this.imgSuit.skin = `res/rechargeCloth/${this._suitId}_${clientCore.LocalInfo.sex}.png`;
-            this.imgFaceReward.skin = clientCore.LocalInfo.sex == 1 ? "plumYellow/RollClothPanel/nv_mei_tong.png" : "plumYellow/RollClothPanel/nan_mei_tong.png";
+            this.imgFaceReward.skin = clientCore.LocalInfo.sex == 1 ? "plumYellow/RollClothPanel1/nv_mei_tong.png" : "plumYellow/RollClothPanel1/nan_mei_tong.png";
+            this.reward1.skin = `plumYellow/RollClothPanel1/gift1_${clientCore.LocalInfo.sex}.png`;
+            this.reward2.skin = `plumYellow/RollClothPanel1/gift2_${clientCore.LocalInfo.sex}.png`;
             this.addEvents();
             //this.btnOther.visible = false;
         }
 
         show(box: any) {
-            clientCore.Logger.sendLog('2022年6月2日活动', '【付费】梅子黄时', '打开以夏为期-破茧成蝶面板');
+            clientCore.Logger.sendLog('2022年6月10日活动', '【付费】梅子黄时', '打开以夏为期-上流法则面板');
             this.setShowInfo(0);
             box.addChild(this);
-            EventManager.event(CHANGE_TIME, "time_2_16");
+            EventManager.event(CHANGE_TIME, "time_10_23");
             PlumYellowModel.instance.checkCoinRecyle(1);
 
         }
@@ -91,7 +93,6 @@ namespace plumYellow {
             BC.addEvent(this, this.btnTry0, Laya.Event.CLICK, this, this.onTry, [0]);
             BC.addEvent(this, this.btnTry2, Laya.Event.CLICK, this, this.onTry, [2]);
             BC.addEvent(this, this.btnTry1, Laya.Event.CLICK, this, this.onTry, [1]);
-            BC.addEvent(this, this.btnTry3, Laya.Event.CLICK, this, this.onTry, [3]);
             BC.addEvent(this, this.btnRoll, Laya.Event.CLICK, this, this.onDraw);
             BC.addEvent(this, this.boxFace, Laya.Event.CLICK, this, this.onReward);
             BC.addEvent(this, this.buyBtn, Laya.Event.CLICK, this, this.openBuy);
@@ -106,7 +107,7 @@ namespace plumYellow {
         }
 
         private changePanel() {
-            EventManager.event(CHANGE_PANEL, subpanel.rollCloth1);
+            EventManager.event(CHANGE_PANEL, subpanel.rollCloth);
         }
 
         /**帮助说明 */
@@ -118,16 +119,14 @@ namespace plumYellow {
             if (i == 0) {
                 clientCore.ModuleManager.open("rewardDetail.PreviewModule", this._suitId);
             } else if (i == 1) {
-                clientCore.ModuleManager.open('previewBG.PreviewBGModule', { id: this._giftId1, condition: '' });
+                clientCore.ModuleManager.open('rewardDetail.PreviewModule', this._giftId1[clientCore.LocalInfo.sex-1]);
             } else if (i == 2) {
-                clientCore.ModuleManager.open('rewardDetail.PreviewModule', [this._giftId2[0] + clientCore.LocalInfo.sex - 1, this._giftId2[1] + clientCore.LocalInfo.sex - 1]);
-            } else {
-                clientCore.ModuleManager.open('previewBG.PreviewBGModule', { id: this._giftId2[2], condition: '' });
+                clientCore.ModuleManager.open('rewardDetail.PreviewModule', this._giftId2[clientCore.LocalInfo.sex-1]);
             }
         }
         /**打开礼包购买面板 */
         private openBuy(): void {
-            alert.showEventBuy([1, 2]);
+            alert.showEventBuy([5, 6]);
         }
 
         /**界面更新 */
@@ -143,7 +142,7 @@ namespace plumYellow {
         private updateCurrent(): void {
             this.boxCur.visible = this.checkDiscount();
             if (this.boxCur.visible) {
-                this.imgCur.skin = `plumYellow/RollClothPanel/${this.curDiscount / 10}.png`;
+                this.imgCur.skin = `plumYellow/RollClothPanel1/${this.curDiscount / 10}.png`;
             }
         }
 
@@ -168,7 +167,7 @@ namespace plumYellow {
 
         /**更新奖池奖励状态 */
         private updateGrid(cfg: xls.rouletteDraw, index: number): void {
-            let item: ui.plumYellow.render.RollClothItemUI = this.boxItem.getChildAt(index) as ui.plumYellow.render.RollClothItemUI;
+            let item: ui.plumYellow.render.RollClothItem1UI = this.boxItem.getChildAt(index) as ui.plumYellow.render.RollClothItem1UI;
             let reward: xls.pair = clientCore.LocalInfo.sex == 1 ? cfg.femaleAward[0] : cfg.maleAward[0];
             item.imgSelect.visible = false;
             item.imgGot.visible = clientCore.ItemsInfo.checkHaveItem(reward.v1);
@@ -190,13 +189,13 @@ namespace plumYellow {
             let len: number = this.boxItem.numChildren;
             let select: number = Math.round(value);
             if (select == this._select) return;
-            let item: ui.plumYellow.render.RollClothItemUI;
+            let item: ui.plumYellow.render.RollClothItem1UI;
             if (this._select != -1) {
-                item = this.boxItem.getChildAt(this._select % len) as ui.plumYellow.render.RollClothItemUI;
+                item = this.boxItem.getChildAt(this._select % len) as ui.plumYellow.render.RollClothItem1UI;
                 item.imgSelect.visible = false;
             }
             this._select = select;
-            item = this.boxItem.getChildAt(this._select % len) as ui.plumYellow.render.RollClothItemUI;
+            item = this.boxItem.getChildAt(this._select % len) as ui.plumYellow.render.RollClothItem1UI;
             item.imgSelect.visible = true;
         }
         private get select() {
@@ -212,7 +211,7 @@ namespace plumYellow {
 
         /**展示当前折扣 */
         private playDiscountAni(discount: number) {
-            this.imgNext.skin = `plumYellow/RollClothPanel/next_${discount / 10}.png`;
+            this.imgNext.skin = `plumYellow/RollClothPanel1/next_${discount / 10}.png`;
             // return new Promise((suc: Function) => {
             //     this.ani1.play(0, false);
             //     this.ani1.once(Laya.Event.COMPLETE, this, suc);
@@ -266,7 +265,7 @@ namespace plumYellow {
 
         /** 更新集齐奖励状态，注意每期奖励类型不同，判定方式会有不同*/
         private updateGift(): void {
-            let hasBg: boolean = clientCore.ItemsInfo.checkHaveItem(this._giftId1[0]);
+            let hasBg: boolean = clientCore.ItemsInfo.checkHaveItem(this._giftId1[clientCore.LocalInfo.sex-1][0]);
             //let hasBg: boolean = clientCore.UserHeadManager.instance.getOneInfoById(this._giftId1).have;
             let canGet = !hasBg && this.curTimes >= this._array.length;
             if (canGet) {

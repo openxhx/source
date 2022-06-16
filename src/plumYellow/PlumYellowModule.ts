@@ -7,6 +7,7 @@ namespace plumYellow {
         discountDraw2,//折扣转盘2
         rollCard,//九宫格
         rollCloth,//扭蛋
+        rollCloth1,//扭蛋
         moleBuy,//摩尔联动
         pieceBuy,//碎片购买
         panicBuy//特卖会
@@ -48,11 +49,11 @@ namespace plumYellow {
 
             this.panelName = [
                 { name: "mo_mo_hua_xian", open: 0, type: subpanel.moleBuy },
-                { name: "chun_shi_xia_zhi", open: 0, type: subpanel.suitBuy1 },
-                { name: "yi_xia_wei_nian", open: 0, type: subpanel.rollCloth },
-                { name: "te_mai_hui", open: 0, type: subpanel.panicBuy },
+                { name: "chun_shi_xia_zhi", open: 0, type: subpanel.suitBuy },
+                { name: "yi_xia_wei_nian", open: 0, type: subpanel.rollCloth1 },
                 { name: "xia_zhuan_nian_nian", open: 0, type: subpanel.discountDraw1 },
-                { name: "liu_li_sui_xia", open: 0, type: subpanel.pieceBuy },
+                { name: "te_mai_hui", open: 0, type: subpanel.panicBuy },
+                // { name: "liu_li_sui_xia", open: 0, type: subpanel.pieceBuy },
 
             ];
 
@@ -149,6 +150,10 @@ namespace plumYellow {
                     case subpanel.rollCloth:
                         await this.loadAtlas("RollClothPanel");
                         this.panelMap.add(type, new RollClothPanel());
+                        break;
+                    case subpanel.rollCloth1:
+                        await this.loadAtlas("RollClothPanel1");
+                        this.panelMap.add(type, new RollClothPanel1());
                         break;
                     case subpanel.pieceBuy:
                         await this.loadAtlas("PieceBuyPanel");

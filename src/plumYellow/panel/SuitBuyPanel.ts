@@ -24,6 +24,7 @@ namespace plumYellow {
      */
     export class SuitBuyPanel extends ui.plumYellow.panel.SuitBuyPanelUI {
         private cfg: SuitBuyData;
+        private giftArr:number[] = [145284 , 145297];
         constructor(data: SuitBuyData) {
             super();
             this.cfg = data;
@@ -41,10 +42,13 @@ namespace plumYellow {
             haveGift = clientCore.ItemsInfo.checkHaveItem(this.cfg.giftId[0]);
             this.btnLing.visible = haveSuit && !haveGift;
             this.line.visible = clientCore.FlowerPetInfo.petType > 0;
+            haveGift = clientCore.ItemsInfo.checkHaveItem(this.giftArr[clientCore.LocalInfo.sex-1]);
+            this.getBtn.visible = haveSuit && !haveGift;
+            this.gift1.skin = `plumYellow/SuitBuyPanel/gift_${clientCore.LocalInfo.sex}.png`
         }
 
         show(box: any) {
-            clientCore.Logger.sendLog('2022年5月27日活动', '【付费】梅子黄时', '打开春逝夏至面板');
+            clientCore.Logger.sendLog('2022年6月10日活动', '【付费】梅子黄时', '打开春逝夏至-见习爱神面板');
             this.setUI();
             clientCore.UIManager.setMoneyIds([this.cfg.coinId, 0]);
             clientCore.UIManager.showCoinBox();
@@ -107,12 +111,18 @@ namespace plumYellow {
         }
 
         /**领取赠品 */
-        private getGift() {
-            net.sendAndWait(new pb.cs_common_recharge_get_ext_reward({ stage: (this.cfg.stage), activityId: PlumYellowModel.instance.activityId, index: this.cfg.index })).then((msg: pb.sc_common_recharge_get_ext_reward) => {
-                alert.showReward(msg.items);
-                // this.imgLing.visible = true;
-                this.btnLing.visible = false;
-            })
+        private getGift(i:number) {
+            if(i == 0){
+                net.sendAndWait(new pb.cs_common_recharge_get_ext_reward({ stage: (this.cfg.stage), activityId: PlumYellowModel.instance.activityId, index: this.cfg.index })).then((msg: pb.sc_common_recharge_get_ext_reward) => {
+                    alert.showReward(msg.items);
+                    this.btnLing.visible = false;
+                })
+            }else{
+                net.sendAndWait(new pb.cs_common_recharge_get_ext_reward({ stage: (this.cfg.stage), activityId: PlumYellowModel.instance.activityId, index: 2 })).then((msg: pb.sc_common_recharge_get_ext_reward) => {
+                    alert.showReward(msg.items);
+                    this.getBtn.visible = false;
+                })
+            }
         }
 
         private changePanel() {
@@ -121,7 +131,8 @@ namespace plumYellow {
 
         addEventListeners() {
             BC.addEvent(this, this.btnHelp, Laya.Event.CLICK, this, this.showRule);
-            BC.addEvent(this, this.btnLing, Laya.Event.CLICK, this, this.getGift);
+            BC.addEvent(this, this.btnLing, Laya.Event.CLICK, this, this.getGift , [0]);
+            BC.addEvent(this, this.getBtn, Laya.Event.CLICK, this, this.getGift , [1]);
             BC.addEvent(this, this.btnTry0, Laya.Event.CLICK, this, this.onTryClick, [0]);
             BC.addEvent(this, this.btnBuy, Laya.Event.CLICK, this, this.buyGoods);
             BC.addEvent(this, this.otherBtn, Laya.Event.CLICK, this, this.changePanel);

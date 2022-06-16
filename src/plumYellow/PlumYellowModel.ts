@@ -79,7 +79,7 @@ namespace plumYellow {
         /**获取直购活动配置 */
         public getSuitBuyCfg(phase: number): SuitBuyData {
             if (phase == 1) {//百舍重茧
-                return new SuitBuyData(3200, 2100366, 1137, 9900334, [3500132], 3, "time_27_9", 1);
+                return new SuitBuyData(3209, 2110670, 1181, 9900334, [1000198], 5, "time_10_23", 1);
             }
             if (phase == 2) {//节气芒种
                 return new SuitBuyData(3203, 2100370, 1134, 9900334, [2500082], 4, "time_2_16", 1);
@@ -88,8 +88,8 @@ namespace plumYellow {
 
         /**获取折扣抽取活动配置 */
         public getDisCountDrawCfg(phase: number): DiscountDrawData {
-            if (phase == 1) {//仲夏莲语
-                return new DiscountDrawData(1, 2110440, [3500133], 1048, 450 , 3 , "time_27_9");
+            if (phase == 1) {//沧海龙吟
+                return new DiscountDrawData(1, 2110672, [1000199], 1048, 520 , 5 , "time_10_23");
             }
             if (phase == 2) {//节气小满
                 return new DiscountDrawData(2, 2100368, [300446, 2500080], 1221, 420 , 1 , "time_20_2");

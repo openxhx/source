@@ -5,6 +5,7 @@ namespace paddingImage {
      */
     export class PaddingImageModule extends ui.paddingImage.PaddingImageModuleUI {
         private rulePanel: PaddingRulePanel;
+        private exchangePanel: ExchangePanel;
         private imgInfo: number[];
         private rewardInfo: number;
         private curImage: number;
@@ -17,8 +18,9 @@ namespace paddingImage {
         private changeTarget: number;
         init() {
             this.addPreLoad(xls.load(xls.activityShape));
+            this.addPreLoad(xls.load(xls.eventExchange));
             this.addPreLoad(this.getEventInfo());
-            this.maxCnt = 15;
+            this.maxCnt = 18;
             this.lisCur.mouseHandler = new Laya.Handler(this, this.onSelect);
             this.lisCur.mouseEnabled = false;
 
@@ -68,26 +70,31 @@ namespace paddingImage {
                 this.imgSuit1.skin = "unpack/paddingImage/5608.png";
                 this.imgSuit2.skin = "unpack/paddingImage/5609.png";
                 this.suit = 2110651;
-            } else if (this.curImage <= 6){
+            } else if (this.curImage <= 6) {
                 this.imgName.skin = "paddingImage/xiong_mao_tao_zhuang.png";
                 this.imgSuit1.skin = "unpack/paddingImage/5684.png";
                 this.imgSuit2.skin = "unpack/paddingImage/5685.png";
                 this.suit = 2110652;
-            } else if (this.curImage <= 9){
+            } else if (this.curImage <= 9) {
                 this.imgName.skin = "paddingImage/suit3.png";
                 this.imgSuit1.skin = "unpack/paddingImage/5626.png";
                 this.imgSuit2.skin = "unpack/paddingImage/5627.png";
                 this.suit = 2110659;
-            }else if(this.curImage <= 12){
+            } else if (this.curImage <= 12) {
                 this.imgName.skin = "paddingImage/suit4.png";
                 this.imgSuit1.skin = "unpack/paddingImage/5780.png";
                 this.imgSuit2.skin = "unpack/paddingImage/5781.png";
                 this.suit = 2110660;
-            }else{
+            } else if (this.curImage <= 15) {
                 this.imgName.skin = "paddingImage/suit5.png";
                 this.imgSuit1.skin = "unpack/paddingImage/5792.png";
                 this.imgSuit2.skin = "unpack/paddingImage/5793.png";
                 this.suit = 2110667;
+            } else if (this.curImage <= 18) {
+                this.imgName.skin = "paddingImage/suit6.png";
+                this.imgSuit1.skin = "unpack/paddingImage/5808.png";
+                this.imgSuit2.skin = "unpack/paddingImage/5809.png";
+                this.suit = 2110678;
             }
         }
 
@@ -247,7 +254,7 @@ namespace paddingImage {
 
         private showChange() {
             if (!this.checkItemEnough(5)) return;
-            if(this.imgInfo[this.curImage - 1] == 0){
+            if (this.imgInfo[this.curImage - 1] == 0) {
                 alert.showFWords("当前没有可交换的格子~");
                 return;
             }
@@ -341,6 +348,11 @@ namespace paddingImage {
             })
         }
 
+        private showExchangePanel() {
+            if (!this.exchangePanel) this.exchangePanel = new ExchangePanel();
+            clientCore.DialogMgr.ins.open(this.exchangePanel);
+        }
+
         addEventListeners() {
             BC.addEvent(this, this.btnLast, Laya.Event.CLICK, this, this.changeIamge, [-1]);
             BC.addEvent(this, this.btnNext, Laya.Event.CLICK, this, this.changeIamge, [1]);
@@ -353,6 +365,7 @@ namespace paddingImage {
             BC.addEvent(this, this.btnCancel, Laya.Event.CLICK, this, this.cancelChange);
             BC.addEvent(this, this.btnTry, Laya.Event.CLICK, this, this.trySuit);
             BC.addEvent(this, this.btnGet, Laya.Event.CLICK, this, this.getReward);
+            BC.addEvent(this, this.btnExchange, Laya.Event.CLICK, this, this.showExchangePanel);
         }
 
         removeEventListeners() {
@@ -361,7 +374,8 @@ namespace paddingImage {
 
         destroy() {
             this.rulePanel?.destroy();
-            this.rulePanel = null;
+            this.exchangePanel?.destroy();
+            this.exchangePanel = this.rulePanel = null;
             clientCore.UIManager.releaseCoinBox();
             super.destroy();
         }
